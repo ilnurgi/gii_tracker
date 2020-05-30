@@ -121,9 +121,22 @@ class BaseTrackerLoader:
         pages_count = 10
         page_limit = 50
 
+        max_year_prefix = '<<<'
+        max_year_prefix_len = len(max_year_prefix)
+        max_year_suffix = '>>>'
+        max_year_suffix_len = len(max_year_suffix)
         for category_link, category_info in self.CATEGORY_ENABLED_LINKS.items():
             category_title = category_info['title']
             category_title_exclude_in = category_info.get('exclude_in', ())
+            max_years = [
+                exclude
+                for exclude in category_title_exclude_in
+                if str(exclude).startswith(max_year_prefix) and str(exclude).endswith(max_year_suffix)
+            ]
+            if max_years:
+                max_year = int(max_years[0][max_year_prefix_len:-max_year_suffix_len])
+                category_title_exclude_in.extend(range(1900, max_year))
+
             for page_number in range(0, pages_count*page_limit, page_limit):
                 current_url = f'{category_link}&start={page_number}'
                 # print(current_url, category_title)

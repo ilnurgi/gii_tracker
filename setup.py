@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='gii_torrents',
-    version='0.1',
+    version='0.2',
     author='ilnurgi',
     author_email='ilnurgi@mail.ru',
     url='http://ilnurgi.ru',
@@ -13,7 +13,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'gii_tracker = gii_tracker.app:main'
+            'gii_torrents = gii_torrents.app:main'
         ]
     }
 )
