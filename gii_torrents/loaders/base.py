@@ -3,7 +3,7 @@
 
 import os
 
-from datetime import datetime, date, timedelta
+from datetime import datetime, date
 from pprint import pprint
 
 import yaml
@@ -43,6 +43,7 @@ class BaseTrackerLoader:
 
         self._load_config_file()
         self._topics = {}
+        self._topics_errors = {}
 
     @property
     def category_topics(self) -> tuple:
@@ -52,6 +53,12 @@ class BaseTrackerLoader:
         for topic_link, topic_info in self._topics.items():
             categories.setdefault(
                 (topic_info['category_link'], topic_info['category_title']), []
+            ).append(
+                (topic_link, topic_info['topic_title'])
+            )
+        for topic_link, topic_info in self._topics_errors.items():
+            categories.setdefault(
+                (topic_info['err_msg'], topic_info['err_msg']), []
             ).append(
                 (topic_link, topic_info['topic_title'])
             )
@@ -153,6 +160,10 @@ class BaseTrackerLoader:
                         continue
 
                     if not topic_date_str:
+                        self._topics_errors[topic_url] = {
+                            'topic_title': topic_title,
+                            'err_msg': 'date is None'
+                        }
                         print(f'ERROR: date is None, ({topic_date_str}, {topic_title}, {topic_url})')
                         continue
 
@@ -199,6 +210,10 @@ class BaseTrackerLoader:
             try:
                 load_url(self.browser, topic_link, count=3)
             except TimeoutError:
+                self._topics_errors[topic_link] = {
+                    'topic_title': topic_title,
+                    'err_msg': 'timeout'
+                }
                 print(f'ERROR, timeout: {topic_link}, {topic_title}')
                 self._topics.pop(topic_link)
                 continue
@@ -206,6 +221,10 @@ class BaseTrackerLoader:
             try:
                 topic_datetime = self.browser.execute_script(self.TOPIC_SCRIPT_1)
             except JavascriptException:
+                self._topics_errors[topic_link] = {
+                    'topic_title': topic_title,
+                    'err_msg': 'js'
+                }
                 print(f'ERROR, js: {topic_link}, {topic_title}')
                 self._topics.pop(topic_link)
                 continue

@@ -5,7 +5,6 @@ from time import sleep
 
 from selenium.webdriver.remote.webdriver import WebDriver
 
-from gii_torrents import settings
 from gii_torrents.helpers import log_method, load_url
 from gii_torrents.loaders.base import BaseTrackerLoader
 

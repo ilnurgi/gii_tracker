@@ -1,8 +1,10 @@
 """приложения для сбора сведений по новым торент файлам
 """
-import os
 
-from datetime import date, timedelta
+import os
+import webbrowser
+
+from datetime import date
 
 from selenium.common.exceptions import NoSuchWindowException
 from selenium.webdriver import Chrome, ChromeOptions
@@ -105,6 +107,7 @@ def save_topics(tracker1: Tracker1, tracker2: Tracker2):
     open(doc_path, 'w', encoding='utf-8').write(
         f'<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"></head><body>{html_body}</body></html>'
     )
+    webbrowser.open(f'file:///{doc_path}')
 
 
 def main():
