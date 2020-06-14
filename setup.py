@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='gii_torrents',
-    version='0.3',
+    version='0.3.1',
     author='ilnurgi',
     author_email='ilnurgi@mail.ru',
     url='http://ilnurgi.ru',
