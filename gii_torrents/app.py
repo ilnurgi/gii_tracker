@@ -5,11 +5,13 @@ import os
 import webbrowser
 
 from datetime import date
+from typing import Union
 
 from selenium.common.exceptions import NoSuchWindowException
 from selenium.webdriver import Chrome, ChromeOptions
 
 from gii_torrents import settings
+from gii_torrents.loaders.base import BaseTrackerLoader
 from gii_torrents.loaders.tracker_1 import Tracker1
 from gii_torrents.loaders.tracker_2 import Tracker2
 
@@ -39,14 +41,19 @@ def get_browser() -> Chrome:
     return browser
 
 
-def pre_process_topics(tracker1: Tracker1, tracker2: Tracker2):
+def pre_process_topics(tracker1: BaseTrackerLoader, tracker2: Union[None, BaseTrackerLoader]):
     """предварительная обработка урлов
     """
     tracker1_pre_process_topics = True
-    tracker2_pre_process_topics = True
 
     tracker1_pre_process_topics_generator = tracker1.pre_process_topics()
-    tracker2_pre_process_topics_generator = tracker2.pre_process_topics()
+
+    if tracker2:
+        tracker2_pre_process_topics_generator = tracker2.pre_process_topics()
+        tracker2_pre_process_topics = True
+    else:
+        tracker2_pre_process_topics_generator = []
+        tracker2_pre_process_topics = False
 
     print('-> START: pre_process_topics')
     while tracker1_pre_process_topics or tracker2_pre_process_topics:
@@ -69,10 +76,15 @@ def process_topics(tracker1: Tracker1, tracker2: Tracker2):
     """основная обработка урлов
     """
     tracker1_process_topics = True
-    tracker2_process_topics = True
 
     tracker1_process_topics_generator = tracker1.process_topics()
-    tracker2_process_topics_generator = tracker2.process_topics()
+
+    if tracker2:
+        tracker2_process_topics_generator = tracker2.process_topics()
+        tracker2_process_topics = True
+    else:
+        tracker2_process_topics_generator = []
+        tracker2_process_topics = False
 
     print('-> START: process_topics')
     while tracker1_process_topics or tracker2_process_topics:
@@ -96,6 +108,9 @@ def save_topics(tracker1: Tracker1, tracker2: Tracker2):
     """
     html_body = ''
     for tracker in (tracker1, tracker2):
+        if not tracker:
+            continue
+
         for category_info, category_topics in tracker.category_topics:
             category_link, category_title = category_info
             ul_topics = '<ul>{topics}</ul>'.format(
