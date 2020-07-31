@@ -23,13 +23,13 @@ class BaseTrackerLoader:
 
     CONFIG_LOAD_KEYS = (
         'CATEGORY_SCRIPT_1', 'CATEGORY_URL', 'CATEGORY_ENABLED_LINKS', 'LINKS_SCRIPT_1', 'TOPIC_SCRIPT_1',
-        'TOPIC_EXCLUDE_TITLES',
+        'TOPIC_EXCLUDE_TITLES_IN',
     )
     CATEGORY_URL = None
     CATEGORY_SCRIPT_1 = None
     LINKS_SCRIPT_1 = None
     TOPIC_SCRIPT_1 = None
-    TOPIC_EXCLUDE_TITLES = None
+    TOPIC_EXCLUDE_TITLES_IN = None
 
     def __init__(self, browser: WebDriver):
         """инициализация экземпляра
@@ -156,7 +156,13 @@ class BaseTrackerLoader:
                     if any(str(exclude).lower() in topic_title.lower() for exclude in category_title_exclude_in):
                         continue
 
-                    if self.TOPIC_EXCLUDE_TITLES and topic_title in self.TOPIC_EXCLUDE_TITLES:
+                    if (
+                            self.TOPIC_EXCLUDE_TITLES_IN and
+                            any(
+                                excl_in in topic_title.lower()
+                                for excl_in in self.TOPIC_EXCLUDE_TITLES_IN
+                            )
+                    ):
                         continue
 
                     if not topic_date_str:
