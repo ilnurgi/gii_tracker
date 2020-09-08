@@ -1,8 +1,9 @@
 """хелперы
 """
+
 from time import sleep
 
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, WebDriverException
 
 from gii_torrents import settings
 
@@ -27,13 +28,14 @@ def load_url(browser, url, count):
     :param url: адрес страницы
     :param count: количество попыток
     """
-    for _ in range(count):
+    for step in range(count):
         try:
             browser.get(url)
-        except TimeoutException:
+        except (TimeoutError, TimeoutException, WebDriverException):
             continue
-        sleep(settings.REQUEST_TIMEOUT)
+        sleep(settings.REQUEST_TIMEOUT + step)
         break
     else:
         # вышли без брейк, значит страница не загрузилась
-        raise TimeoutException()
+        print(url)
+        raise TimeoutError()

@@ -147,11 +147,17 @@ class BaseTrackerLoader:
             for page_number in range(0, pages_count*page_limit, page_limit):
                 current_url = f'{category_link}&start={page_number}'
                 # print(current_url, category_title)
-                load_url(self.browser, current_url, count=3)
+                load_url(self.browser, current_url, count=4)
 
                 topics = {}
 
-                for topic_date_str, topic_url, topic_title in self.browser.execute_script(self.LINKS_SCRIPT_1):
+                try:
+                    links_script = self.browser.execute_script(self.LINKS_SCRIPT_1)
+                except JavascriptException:
+                    print(current_url)
+                    raise
+
+                for topic_date_str, topic_url, topic_title in links_script:
 
                     if any(str(exclude).lower() in topic_title.lower() for exclude in category_title_exclude_in):
                         continue
