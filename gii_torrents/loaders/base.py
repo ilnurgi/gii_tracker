@@ -135,6 +135,8 @@ class BaseTrackerLoader:
         for category_link, category_info in self.CATEGORY_ENABLED_LINKS.items():
             category_title = category_info['title']
             category_title_exclude_in = category_info.get('exclude_in', ())
+            category_title_exclude_soft_in = category_info.get('exclude_soft_in', ())
+            category_title_include_in = category_info.get('include_in', ())
             max_years = [
                 exclude
                 for exclude in category_title_exclude_in
@@ -147,7 +149,7 @@ class BaseTrackerLoader:
             for page_number in range(0, pages_count*page_limit, page_limit):
                 current_url = f'{category_link}&start={page_number}'
                 # print(current_url, category_title)
-                load_url(self.browser, current_url, count=4)
+                load_url(self.browser, current_url, count=5)
 
                 topics = {}
 
@@ -159,7 +161,21 @@ class BaseTrackerLoader:
 
                 for topic_date_str, topic_url, topic_title in links_script:
 
-                    if any(str(exclude).lower() in topic_title.lower() for exclude in category_title_exclude_in):
+                    if (
+                            # исключаем по жесткому
+                            any(
+                                str(exclude).lower() in topic_title.lower()
+                                for exclude in category_title_exclude_in
+                            ) or (
+                                any(
+                                    str(exclude).lower() in topic_title.lower()
+                                    for exclude in category_title_exclude_soft_in
+                                ) and not any(
+                                    str(include).lower() in topic_title.lower()
+                                    for include in category_title_include_in
+                                )
+                            )
+                    ):
                         continue
 
                     if (
